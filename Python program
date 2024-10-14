@@ -1,0 +1,124 @@
+import tkinter as tk
+import math
+import random
+
+class FLAMESGame:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("FLAMES Game")
+        self.root.configure(bg='#FFC5C5')  
+
+        
+        self.name1_label = tk.Label(self.root, text="Enter Name 1:", bg='#FFC5C5', fg='black')
+        self.name1_label.pack()
+        self.name1_entry = tk.Entry(self.root)
+        self.name1_entry.pack()
+
+        
+        self.name2_label = tk.Label(self.root, text="Enter Name 2:", bg='#FFC5C5', fg='black')
+        self.name2_label.pack()
+        self.name2_entry = tk.Entry(self.root)
+        self.name2_entry.pack()
+
+        
+        self.play_button = tk.Button(self.root, text="Check FLAMES", command=self.play_game)
+        self.play_button.pack()
+
+        
+        self.result_label = tk.Label(self.root, text="", bg='#FFC5C5', fg='black')
+        self.result_label.pack()
+
+        
+        self.canvas = tk.Canvas(self.root, width=600, height=600, bg='#FFC5C5', highlightthickness=0)
+        self.canvas.pack()
+
+        
+        self.draw_background_hearts()
+
+       
+        self.draw_heart()
+
+       
+        self.animate_heart()
+
+        self.root.mainloop()
+
+    def draw_background_hearts(self):
+        """Draw small hearts in the background."""
+        for _ in range(80):  
+            x = random.randint(0, 600)
+            y = random.randint(0, 600)
+            self.draw_small_heart(x, y)
+
+    def draw_small_heart(self, x, y):
+        """Draw a small heart shape at the specified coordinates."""
+        points = []
+        scale = 0.1  
+        for t in range(0, 360):
+            k = math.radians(t)
+            heart_x = (16 * math.sin(k)**3) * scale
+            heart_y = (13 * math.cos(k) - 5 * math.cos(2 * k) - 2 * math.cos(3 * k) - math.cos(4 * k)) * scale
+            points.append((x + heart_x * 10, y - heart_y * 10)) 
+
+       
+        self.canvas.create_polygon(points, fill='red', outline='red')
+
+    def draw_heart(self, scale=10):
+        """Draw a large heart shape in the center of the canvas."""
+        self.canvas.delete("heart")  
+        points = []
+        for t in range(0, 360):
+            k = math.radians(t)
+            x = (16 * math.sin(k)**3) * scale 
+            y = (13 * math.cos(k) - 5 * math.cos(2 * k) - 2 * math.cos(3 * k) - math.cos(4 * k)) * scale
+            points.append((300 + x, 300 - y))  
+
+        
+        self.canvas.create_polygon(points, fill='red', outline='red', tags="heart")
+
+    def animate_heart(self):
+        """Animate the heart to create a beating effect."""
+        for scale in [10.1, 10]:  
+            self.draw_heart(scale)
+            self.canvas.update()
+            self.canvas.after(300) 
+
+       
+        self.root.after(100, self.animate_heart)
+
+    def play_game(self):
+        """Calculate the relationship based on the FLAMES logic."""
+        name1 = self.name1_entry.get()
+        name2 = self.name2_entry.get()
+
+        if not name1 or not name2:
+            self.result_label['text'] = "Please enter both names"
+            return
+
+        flames = ['F', 'L', 'A', 'M', 'E', 'S']
+        count = 0
+
+       
+        for char in name1.lower():
+            if char in name2.lower():
+                count += 1
+
+        index = (len(name1) + len(name2) - count) % 6
+        result = flames[index]
+
+        
+        if result == 'F':
+            self.result_label['text'] = f"{name1} and {name2} are Friends"
+        elif result == 'L':
+            self.result_label['text'] = f"{name1} and {name2} are Lovers"
+        elif result == 'A':
+            self.result_label['text'] = f"{name1} and {name2} are Affectionate"
+        elif result == 'M':
+            self.result_label['text'] = f"{name1} and {name2} are Marriage"
+        elif result == 'E':
+            self.result_label['text'] = f"{name1} and {name2} are Enemies"
+        elif result == 'S':
+            self.result_label['text'] = f"{name1} and {name2} are Siblings"
+
+if __name__ == "__main__":
+    FLAMESGame()
